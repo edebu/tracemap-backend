@@ -10,27 +10,27 @@ app.get("/api/traceroute", (req, res) => {
     const target = req.query.target;
     if (!target) return res.status(400).send("Target is required");
     
-    try {
-        // Check if traceroute is installed
-        execSync("command -v traceroute");
-    } catch {
-        // Detect Linux distribution and install traceroute
-        const distro = execSync("cat /etc/os-release | grep ^ID=").toString().split("=")[1].trim();
-        try {
-            if (distro === "ubuntu" || distro === "debian") {
-                execSync("apt-get update && apt-get install -y traceroute");
-            } else if (distro === "centos" || distro === "fedora" || distro === "rhel") {
-                execSync("yum install -y traceroute");
-            } else if (distro === "amzn" || distro == "amzn") {
-                execSync("yum install -y traceroute");
-            } else {
-                return res.status(500).send("Unsupported Linux distribution. Please install traceroute manually. Distro: " + distro);
-            }
-        } catch (installErr) {
-            execSync("yum install -y traceroute");
-            return res.status(500).send("Failed to install traceroute: " + installErr.message + " Distro: " + distro);
-        }
-    }
+    // try {
+    //     // Check if traceroute is installed
+    //     execSync("command -v traceroute");
+    // } catch {
+    //     // Detect Linux distribution and install traceroute
+    //     const distro = execSync("cat /etc/os-release | grep ^ID=").toString().split("=")[1].trim();
+    //     try {
+    //         if (distro === "ubuntu" || distro === "debian") {
+    //             execSync("apt-get update && apt-get install -y traceroute");
+    //         } else if (distro === "centos" || distro === "fedora" || distro === "rhel") {
+    //             execSync("yum install -y traceroute");
+    //         } else if (distro === "amzn" || distro == "amzn") {
+    //             execSync("yum install -y traceroute");
+    //         } else {
+    //             return res.status(500).send("Unsupported Linux distribution. Please install traceroute manually. Distro: " + distro);
+    //         }
+    //     } catch (installErr) {
+    //         execSync("yum install -y traceroute");
+    //         return res.status(500).send("Failed to install traceroute: " + installErr.message + " Distro: " + distro);
+    //     }
+    // }
 
     exec(`traceroute && traceroute ${target}`, (err, stdout, stderr) => {
         if (err) {
