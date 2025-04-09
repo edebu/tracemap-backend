@@ -5,9 +5,7 @@
   "buildCommand": "yum install -y traceroute",
   "functions": {
     "api": {
-      "maxDuration": 10,
-      "memory": 1024,
-      "runtime": "nodejs18.x"
+      "runtime": "@vercel/node"
     }
   },
   "outputDirectory": "api"
