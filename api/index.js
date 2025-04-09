@@ -24,7 +24,7 @@ app.get("/api/traceroute", (req, res) => {
             } else if (distro === "amzn") {
                 execSync("yum install -y traceroute");
             } else {
-                return res.status(500).send("Unsupported Linux distribution. Please install traceroute manually.");
+                return res.status(500).send("Unsupported Linux distribution. Please install traceroute manually. Distro: " + distro);
             }
         } catch (installErr) {
             return res.status(500).send("Failed to install traceroute: " + installErr.message + " Distro: " + distro);
