@@ -32,7 +32,7 @@ app.get("/api/traceroute", (req, res) => {
     //     }
     // }
 
-    exec(`traceroute && traceroute ${target}`, (err, stdout, stderr) => {
+    exec(`traceroute ${target}`, (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: stderr });
         }
