@@ -29,7 +29,7 @@ app.get("/api/traceroute", async (req, res) => {
     //     }
     // }
 
-    await execFile('traceroute', ['--version'], (err, stdout, stderr) => {
+    await execFile('/usr/bin/traceroute', ['--version'], (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: stderr + " " + err });
         }
