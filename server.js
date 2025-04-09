@@ -33,6 +33,10 @@ app.get("/api/traceroute", (req, res) => {
     });
 });
 
+app.get("/", (req, res) => {
+    res.send("Welcome to the Tracemap API!");
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
