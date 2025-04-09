@@ -1,10 +1,7 @@
 const express = require("express");
-const cors = require("cors");
-const { exec, execSync } = require("child_process");
+const { exec, execSync, execFile } = require("child_process");
 
 const app = express();
-app.use(cors());
-const PORT = 5000;
 
 app.get("/api/traceroute", (req, res) => {
     const target = req.query.target;
@@ -32,7 +29,7 @@ app.get("/api/traceroute", (req, res) => {
     //     }
     // }
 
-    exec(`/usr/bin/traceroute ${target}`, (err, stdout, stderr) => {
+    execFile('traceroute', [target], (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: stderr });
         }
@@ -59,8 +56,5 @@ app.get("/", (req, res) => {
     res.send("Welcome to the Tracemap API!");
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
 
 module.exports = app;
