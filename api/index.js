@@ -34,6 +34,11 @@ app.get("/api/traceroute", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+    exec(`yum install -y traceroute`, (err, stdout, stderr) => {
+        if (err) {
+            return res.status(500).json({ error: stderr });
+        }
+    });
     res.send("Welcome to the Tracemap API!");
 });
 
