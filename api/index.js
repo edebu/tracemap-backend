@@ -3,7 +3,7 @@ const { exec, execSync, execFile } = require("child_process");
 
 const app = express();
 
-app.get("/api/traceroute", (req, res) => {
+app.get("/api/traceroute", async (req, res) => {
     const target = req.query.target;
     if (!target) return res.status(400).send("Target is required");
     
@@ -29,7 +29,7 @@ app.get("/api/traceroute", (req, res) => {
     //     }
     // }
 
-    execFile('traceroute', [target], (err, stdout, stderr) => {
+    await execFile('traceroute', [target], (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: stderr });
         }
