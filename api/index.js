@@ -3,8 +3,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 const axios = require("axios"); // Add axios for HTTP requests
 const { v4 } = require("is-ip")
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
+
 app.get("/api/traceroute", async (req, res) => {
     const target = req.query.target;
     if (!target) return res.status(400).send("Target is required");
