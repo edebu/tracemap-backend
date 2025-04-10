@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require('dotenv');
 dotenv.config();
 const axios = require("axios"); // Add axios for HTTP requests
-const { isIPv4 } = require("is-ip")
+const { v4 } = require("is-ip")
 
 const app = express();
 app.get("/api/traceroute", async (req, res) => {
@@ -33,7 +33,7 @@ app.get("/api/traceroute", async (req, res) => {
             }
 
             // Validate IP address
-            if (!isIPv4(ip)) {
+            if (!v4(ip)) {
                 return null; // Return null for invalid IPs
             }
 
