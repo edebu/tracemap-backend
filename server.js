@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { exec, execSync } = require("child_process");
+const { execSync, execFile } = require("child_process");
 
 const app = express();
 app.use(cors());
@@ -31,7 +31,7 @@ app.get("/api/traceroute", (req, res) => {
         }
     }
 
-    exec(`traceroute ${target}`, (err, stdout, stderr) => {
+    execFile('traceroute', [target], (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: stderr });
         }

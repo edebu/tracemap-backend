@@ -1,60 +1,58 @@
 const express = require("express");
-const { exec, execSync, execFile } = require("child_process");
+const dotenv = require('dotenv');
+dotenv.config();
+const axios = require("axios"); // Add axios for HTTP requests
+const { isIPv4 } = require("is-ip")
 
 const app = express();
-
 app.get("/api/traceroute", async (req, res) => {
     const target = req.query.target;
     if (!target) return res.status(400).send("Target is required");
-    
-    // try {
-    //     // Check if traceroute is installed
-    //     execSync("command -v traceroute");
-    // } catch {
-    //     // Detect Linux distribution and install traceroute
-    //     const distro = execSync("cat /etc/os-release | grep ^ID=").toString().split("=")[1].trim();
-    //     try {
-    //         if (distro === "ubuntu" || distro === "debian") {
-    //             execSync("apt-get update && apt-get install -y traceroute");
-    //         } else if (distro === "centos" || distro === "fedora" || distro === "rhel") {
-    //             execSync("yum install -y traceroute");
-    //         } else if (distro === "amzn" || distro == "amzn") {
-    //             execSync("yum install -y traceroute");
-    //         } else {
-    //             return res.status(500).send("Unsupported Linux distribution. Please install traceroute manually. Distro: " + distro);
-    //         }
-    //     } catch (installErr) {
-    //         execSync("yum install -y traceroute");
-    //         return res.status(500).send("Failed to install traceroute: " + installErr.message + " Distro: " + distro);
-    //     }
-    // }
 
-    await execFile('/usr/bin/traceroute', ['--version'], (err, stdout, stderr) => {
-        if (err) {
-            return res.status(500).json({ error: stderr + " " + err });
-        }
-
-        const lines = stdout.split("\n").slice(1); // skip header
-        const hops = lines.map(line => {
-            const match = line.match(/^\s*(\d+)\s+([^\s]+)\s+\(([\d.]+)\)\s+([\d.]+) ms/);
-            if (match) {
-                return {
-                    hop: Number(match[1]),
-                    host: match[2],
-                    ip: match[3],
-                    time: Number(match[4])
-                };
+    try {
+        const response = await axios.post(
+            process.env.API_URL, 
+            { url: target },
+            {
+                headers: {
+                    "x-api-key": process.env.API_KEY,
+                    "Content-Type": "application/json"
+                }
             }
-            return null;
-        }).filter(Boolean);
+        );
 
-        res.json(hops);
-    });
+        // Parse the response to extract IP addresses
+        const parsedData = response.data.data.map(item => {
+            const host = item.host;
+            let ip = host;
+
+            // Check if host contains parentheses
+            const match = host.match(/\((\d{1,3}(?:\.\d{1,3}){3})\)/);
+            if (match) {
+                ip = match[1]; // Extract IP from parentheses
+            }
+
+            // Validate IP address
+            if (!isIPv4(ip)) {
+                return null; // Return null for invalid IPs
+            }
+
+            return { 
+                hop: Number(item.hop),
+                host, 
+                ip,
+                time: Number(item.avg) 
+            };
+        }).filter(item => item !== null); // Filter out null values
+
+        res.json(parsedData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.get("/", (req, res) => {
     res.send("Welcome to the Tracemap API!");
 });
-
 
 module.exports = app;
